@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Stream _peticion;
   FirebaseService _fs;
   StorageService _ss;
+  String _busquedaResult;
 
   void initState(){
     super.initState();
@@ -36,6 +37,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _fs = new FirebaseService(widget.user.uid);
     _peticion = _fs.streamDataCollection();
     _ss = new StorageService(widget.user);
+    _busquedaResult = "";
+
+//    _comprobarEmail();
     
   }
 
@@ -139,7 +143,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       controller: _busquedaController,
                       maxLines: 1,
                       onChanged: (valor){
-
+                        setState(() {
+                          _busquedaResult = valor.toLowerCase();
+                        });
                       },
                       autofocus: false,
                       keyboardType: TextInputType.text,
@@ -283,11 +289,78 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             shrinkWrap: true,
             physics: ScrollPhysics(),
             itemCount: snapshot.data.documents.length,
-            itemBuilder: (context, index) => _crearNota(snapshot.data.documents[index])
+            itemBuilder: (context, index){
+              if(_busquedaResult != ""){
+                if(snapshot.data.documents[index]['titulo'].toLowerCase().contains(_busquedaResult)){
+                  return _crearNota(snapshot.data.documents[index]);
+                }
+              }else{
+                return _crearNota(snapshot.data.documents[index]);
+              }
+//              return _crearNota(snapshot.data.documents[index]);
+              return Visibility(
+                visible: false,
+                child: Text("Sin resultados"),
+              );
+            } 
           );
         }
 
       ),
+    );
+  }
+
+  void _comprobarEmail(){
+    if(!widget.user.isEmailVerified){
+      _dialogoEmail();
+    }
+  }
+
+  void _dialogoEmail(){
+    showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: new Text("Email sin confirmar", 
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).primaryColor,
+            )
+          ),
+          content: new Text("Recuerde confirmar su dirección de email a través del enlace que se le proporcionó. Si no lo recibió, pulse 'Reenviar'",
+            style: TextStyle(
+              color: Theme.of(context).primaryColor,
+            )
+          ),
+          actions: <Widget>[
+            new Row(
+              children: <Widget>[
+                new FlatButton(
+                  child: new Text("Reenviar",
+                    style: TextStyle(
+                      color: Colors.blueAccent
+                    )
+                  ),
+                  onPressed: () {
+                    widget.user.sendEmailVerification();
+                    Navigator.pop(context);
+                  },
+                ),
+                new FlatButton(
+                  child: new Text("Aceptar",
+                    style: TextStyle(
+                      color: Colors.blueAccent
+                    )
+                  ),
+                  onPressed: (){
+                    Navigator.pop(context);
+                  }
+                )
+              ],
+            )
+          ],
+        );
+      }
     );
   }
 

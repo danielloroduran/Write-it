@@ -340,6 +340,7 @@ class _RegistroPageState extends State<RegistroPage>{
       setState(() {
         _estaCargando = false;
       });
+      user.sendEmailVerification();
 
       Navigator.push(
         context,
