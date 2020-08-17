@@ -297,7 +297,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               }else{
                 return _crearNota(snapshot.data.documents[index]);
               }
-//              return _crearNota(snapshot.data.documents[index]);
               return Visibility(
                 visible: false,
                 child: Text("Sin resultados"),
