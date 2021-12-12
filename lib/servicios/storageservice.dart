@@ -7,10 +7,10 @@ import 'package:notes_app/modelos/nota.dart';
 class StorageService{
 
   FirebaseStorage _db = FirebaseStorage.instance;
-  StorageReference reference;
-  StorageUploadTask uploadTask;
-  StorageTaskSnapshot taskSnapshot;
-  final FirebaseUser user;
+  Reference reference;
+  UploadTask uploadTask;
+  TaskSnapshot taskSnapshot;
+  final User user;
 
 
   StorageService(this.user);
@@ -18,8 +18,7 @@ class StorageService{
   Future<String> subirFotoPerfil(File imagen) async{
     reference = _db.ref().child("/"+user.uid+"/perfil.jpg");
     uploadTask = reference.putFile(imagen);
-    taskSnapshot = await uploadTask.onComplete;
-    return await taskSnapshot.ref.getDownloadURL();
+    return await uploadTask.snapshot.ref.getDownloadURL();
   }
 
   Future borrarFotoPerfil(String path) async{
@@ -29,8 +28,7 @@ class StorageService{
   Future<String> subirFotoNota(File imagen, Nota nota) async{
     reference = _db.ref().child("/"+user.uid+"/"+nota.id+".jpg");
     uploadTask = reference.putFile(imagen);
-    taskSnapshot = await uploadTask.onComplete;
-    return await taskSnapshot.ref.getDownloadURL();
+    return await uploadTask.snapshot.ref.getDownloadURL();
   }
 
   Future borrarFotoNota(String path) async{

@@ -72,15 +72,18 @@ class _RegistroPageState extends State<RegistroPage>{
           ), 
           Container(
             margin: EdgeInsets.symmetric(horizontal: 90),
-            child: RaisedButton.icon(
-              
+            child: ElevatedButton.icon(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16))
+                )),
+                textStyle: MaterialStateProperty.all(TextStyle(
+                  color: Theme.of(context).textTheme.headline1.color
+                ))
+              ),
               label: Text("Cambiar foto de perfil"),
               icon: Icon(Icons.camera_alt),
-              color: Theme.of(context).primaryColor,
-              textColor: Theme.of(context).textTheme.title.color,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16))
-              ),
               onPressed: (){
                 _usoDeCamara();
               }
@@ -212,17 +215,21 @@ class _RegistroPageState extends State<RegistroPage>{
             AnimatedContainer(
               margin: EdgeInsets.only(left: 10),
               duration: Duration(milliseconds: 100),
-              child: _estaCargando == false ?RaisedButton.icon(
-                color: Colors.blue[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(100),
-                    bottomLeft: Radius.circular(100),
-                  )
+              child: _estaCargando == false ? ElevatedButton.icon(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue[700]),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(100),
+                      bottomLeft: Radius.circular(100),
+                    )
+                  )),
+                  textStyle: MaterialStateProperty.all(TextStyle(
+                    color: Theme.of(context).primaryColor
+                  ))
                 ),
                 icon: Icon(Icons.done),
                 label: Text("Registrarse"),
-                textColor: Theme.of(context).primaryColor,
                 onPressed: () {
 
                   setState(() {
@@ -285,7 +292,7 @@ class _RegistroPageState extends State<RegistroPage>{
   void _registrarse() async{
 
     try{
-      FirebaseUser user = await widget.us.createUser(_emailController.text, _passwordController.text);
+      User user = await widget.us.createUser(_emailController.text, _passwordController.text);
       _actualizarDatos(user);
 
     }catch(e){
@@ -306,15 +313,12 @@ class _RegistroPageState extends State<RegistroPage>{
     }
   }
 
-  void _actualizarDatos(FirebaseUser user) async{
+  void _actualizarDatos(User user) async{
 
     String url = "";
 
     try{
-      print("Antes de UserInfo");
-      UserUpdateInfo userInfo = UserUpdateInfo();
-      print("Después de userInfo");
-      userInfo.displayName = _nombreController.text;
+      await user.updateDisplayName(_nombreController.text);
       print("Antes de SS");
       StorageService ss = new StorageService(user);
       print("Antes de la URL");
@@ -322,11 +326,11 @@ class _RegistroPageState extends State<RegistroPage>{
       if(_fotoPerfil != null){
         url = await ss.subirFotoPerfil(_fotoPerfil);
         print("Ya tengo la URL");
-        userInfo.photoUrl = url;
-        print("He asignado la URL");        
+        await user.updatePhotoURL(url);
+        print("He asignado la URL");
+                
       }
 
-      await user.updateProfile(userInfo);
       print("Uso updateProfile");
 
       FirebaseService fs = new FirebaseService(user.uid);
@@ -370,7 +374,7 @@ class _RegistroPageState extends State<RegistroPage>{
           actions: <Widget>[
             new Row(
               children: <Widget>[
-                new FlatButton(
+                new TextButton(
                   child: new Text("Cancelar",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -380,7 +384,7 @@ class _RegistroPageState extends State<RegistroPage>{
                     Navigator.pop(context);
                   },
                 ),
-                new FlatButton(
+                new TextButton(
                   child: new Text("Galería",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -391,7 +395,7 @@ class _RegistroPageState extends State<RegistroPage>{
                     _getImagen(false);
                   },
                 ),
-                new FlatButton(
+                new TextButton(
                   child: new Text("Cámara",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -415,9 +419,9 @@ class _RegistroPageState extends State<RegistroPage>{
     var imagen;
 
     if(usarCamara){
-      imagen = await ImagePicker().getImage(source: ImageSource.camera);
+      imagen = await ImagePicker().pickImage(source: ImageSource.camera);
     }else{
-      imagen = await ImagePicker().getImage(source: ImageSource.gallery);
+      imagen = await ImagePicker().pickImage(source: ImageSource.gallery);
     }
 
     if(imagen != null){

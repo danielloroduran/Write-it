@@ -10,7 +10,7 @@ import 'package:notes_app/servicios/userservice.dart';
 class PerfilPage extends StatefulWidget{
 
   final StorageService ss;
-  FirebaseUser user;
+  User user;
   final UserService us;
   final FirebaseService fs;
 
@@ -68,7 +68,7 @@ class _PerfilPageState extends State<PerfilPage>{
       appBar: _getAppbar(context),
       body: ListView(
         children: <Widget>[
-          widget.user.photoUrl != "" && widget.user.photoUrl != null ? AnimatedContainer(
+          widget.user.photoURL != "" && widget.user.photoURL != null ? AnimatedContainer(
             duration: Duration(milliseconds: 100),
             margin: EdgeInsets.only(top: 50, right: 130, left: 130),
             width: 150,
@@ -114,15 +114,18 @@ class _PerfilPageState extends State<PerfilPage>{
           ), 
           _editar == true ? Container(
             margin: EdgeInsets.symmetric(horizontal: 90),
-            child: RaisedButton.icon(
-              
+            child: ElevatedButton.icon(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Theme.of(context).primaryColor),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16))
+                )),
+                textStyle: MaterialStateProperty.all(TextStyle(
+                  color: Theme.of(context).textTheme.headline1.color
+                ))
+              ),
               label: Text("Cambiar foto de perfil"),
               icon: Icon(Icons.camera_alt),
-              color: Theme.of(context).primaryColor,
-              textColor: Theme.of(context).textTheme.title.color,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(16))
-              ),
               onPressed: (){
                 _usoDeCamara();
               }
@@ -234,17 +237,21 @@ class _PerfilPageState extends State<PerfilPage>{
             AnimatedContainer(
               margin: EdgeInsets.only(left: 10),
               duration: Duration(milliseconds: 100),
-              child: RaisedButton.icon(
-                color: Colors.blue[700],
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
+              child: ElevatedButton.icon(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue[700]),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(100),
                     bottomLeft: Radius.circular(100),
                   )
+                  )),
+                  textStyle: MaterialStateProperty.all(TextStyle(
+                    color: Theme.of(context).primaryColor
+                  ))
                 ),
                 icon: _editar == false ? Icon(Icons.edit) : Icon(Icons.done),
                 label: _editar == false ? Text("Editar") : Text("Guardar"),
-                textColor: Theme.of(context).primaryColor,
                 onPressed: _editar == false ? () {
                   setState(() {
                     _editar = !_editar;
@@ -265,22 +272,20 @@ class _PerfilPageState extends State<PerfilPage>{
     String url;
 
     try{
-      UserUpdateInfo userInfo = UserUpdateInfo();
-      userInfo.displayName = _nombreController.text;
 
       if(_fotoPerfil != null){
         url = await widget.ss.subirFotoPerfil(_fotoPerfil);
-        userInfo.photoUrl = url;
+        await widget.user.updatePhotoURL(url);
       }
       
-      await widget.user.updateProfile(userInfo);
+      await widget.user.updateDisplayName(_nombreController.text);
       await widget.user.updateEmail(_emailController.text);
 
       Map<String, dynamic> userMap = {"nombre" : _nombreController.text, "email" : _emailController.text, "fotoURL" : url};
 
       widget.fs.updateUser(userMap);
 
-      FirebaseUser userAct = await widget.us.getCurrentUser();
+      User userAct = await widget.us.getCurrentUser();
       setState(() {
         widget.user = userAct;
         _editar = false;
@@ -322,14 +327,14 @@ class _PerfilPageState extends State<PerfilPage>{
           actions: <Widget>[
             new Row(
               children: <Widget>[
-                new FlatButton(
+                new TextButton(
                   child: new Text("Salir"),
                   onPressed: () {
                     Navigator.pop(context);
                     Navigator.pop(context);
                   },
                 ),
-                new FlatButton(
+                new TextButton(
                   child: new Text("Seguir editando"),
                   onPressed: (){
                     Navigator.pop(context);
@@ -425,11 +430,16 @@ class _PerfilPageState extends State<PerfilPage>{
                     new Container(
                       height: 40,
                       width: 300,
-                      child: new RaisedButton(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        color: Colors.blue,
+                      child: new ElevatedButton(
+                        style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(18))
+                )),
+                textStyle: MaterialStateProperty.all(TextStyle(
+                  color: Theme.of(context).textTheme.headline1.color
+                ))
+              ),
                         child:  Text("Actualizar", style: TextStyle(color: Colors.white)),
                         onPressed: (){   
                           if(_passwordActualController.text == "" && _passwordNuevaController.text == ""){
@@ -479,8 +489,8 @@ class _PerfilPageState extends State<PerfilPage>{
   void _reautenticar() async{
     try{
       
-      AuthResult auth = await widget.user.reauthenticateWithCredential(
-      EmailAuthProvider.getCredential(
+      UserCredential auth = await widget.user.reauthenticateWithCredential(
+      EmailAuthProvider.credential(
         email: widget.user.email,
         password: _passwordActualController.text,
       )
@@ -521,7 +531,7 @@ class _PerfilPageState extends State<PerfilPage>{
           actions: <Widget>[
             new Row(
               children: <Widget>[
-                new FlatButton(
+                new TextButton(
                   child: new Text("Cancelar",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -531,7 +541,7 @@ class _PerfilPageState extends State<PerfilPage>{
                     Navigator.pop(context);
                   },
                 ),
-                new FlatButton(
+                new TextButton(
                   child: new Text("Galería",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -542,7 +552,7 @@ class _PerfilPageState extends State<PerfilPage>{
                     _getImagen(false);
                   },
                 ),
-                new FlatButton(
+                new TextButton(
                   child: new Text("Cámara",
                     style: TextStyle(
                       color: Colors.blueAccent
@@ -566,9 +576,9 @@ class _PerfilPageState extends State<PerfilPage>{
     var imagen;
 
     if(usarCamara){
-      imagen = await ImagePicker().getImage(source: ImageSource.camera);
+      imagen = await ImagePicker().pickImage(source: ImageSource.camera);
     }else{
-      imagen = await ImagePicker().getImage(source: ImageSource.gallery);
+      imagen = await ImagePicker().pickImage(source: ImageSource.gallery);
     }
 
     if(imagen != null){

@@ -13,7 +13,7 @@ import 'package:notes_app/servicios/userservice.dart';
 
 class HomePage extends StatefulWidget{
 
-  final FirebaseUser user;
+  final User user;
   final UserService us;
   HomePage({Key key, this.user, this.us}) : super(key:  key);
 
@@ -74,7 +74,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     padding: EdgeInsets.all(16),
                     alignment: Alignment.centerRight,
                     child: CircleAvatar(
-                      backgroundImage: widget.user.photoUrl != null && widget.user.photoUrl != "" ? NetworkImage(widget.user.photoUrl) : ExactAssetImage('imagenes/personagenerica.png'),
+                      backgroundImage: widget.user.photoURL != null && widget.user.photoURL != "" ? NetworkImage(widget.user.photoURL) : ExactAssetImage('imagenes/personagenerica.png'),
                       backgroundColor: Colors.transparent,
                       radius: 27,
                     ),
@@ -212,7 +212,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget _crearNota(DocumentSnapshot document){
 
-    Nota nota = new Nota(titulo: document['titulo'], mensaje: document['mensaje'], fecha: document['fecha'].toDate(), importante: document['importante'], id: document.documentID, urlImagen: document['urlImagen'], pathImagen: document['pathImagen']);
+    Nota nota = new Nota(titulo: document['titulo'], mensaje: document['mensaje'], fecha: document['fecha'].toDate(), importante: document['importante'], id: document.id, urlImagen: document['urlImagen'], pathImagen: document['pathImagen']);
 
     String fecha = nota.fecha.day.toString() + "/" + nota.fecha.month.toString() + "/" + nota.fecha.year.toString() + ", " + nota.fecha.hour.toString() + ":" + nota.fecha.minute.toString();
     return Container(
@@ -310,7 +310,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _comprobarEmail(){
-    if(!widget.user.isEmailVerified){
+    if(!widget.user.emailVerified){
       _dialogoEmail();
     }
   }

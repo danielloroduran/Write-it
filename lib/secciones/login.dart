@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController _emailController;
   TextEditingController _passwordController;
-  FirebaseUser _user;
+  User _user;
   String _falloEmail;
   String _falloPassword;
   bool _validateEmail;
@@ -126,23 +126,28 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 ),
                 Container(
                   padding: EdgeInsets.fromLTRB(200, 0, 10, 10),
-                  child: FlatButton(
+                  child: TextButton(
+                    style: ButtonStyle(
+                      //textStyle: MaterialStateProperty.all(Theme.of(context).buttonTheme.textTheme),
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))),
+                    ),
                     onPressed: () {},
-                    textTheme: Theme.of(context).buttonTheme.textTheme,
                     child: Text("¿Contraseña olvidada?"),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
                 ),
                 Container(
                   padding: EdgeInsets.fromLTRB(25, 0, 10, 10),
-                  child: RaisedButton(
+                  child: ElevatedButton(
                     child: Text("Iniciar sesión",
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.black,
                       )
                     ),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),),
+                      backgroundColor: MaterialStateProperty.all(Theme.of(context).buttonTheme.colorScheme.background)
+                    ),
                     onPressed: (){
                       if(_emailController.text == "" && _passwordController.text == ""){
                         setState(() {
@@ -175,7 +180,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         iniciarSesion();
                       }
                     },
-                    color: Theme.of(context).buttonColor,
                     
                   )
                 ),
@@ -183,7 +187,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   child: Container(
                     padding: EdgeInsets.fromLTRB(25, 10, 10, 10),
                     child: Text("O inicie sesión con",
-                      style: Theme.of(context).textTheme.subtitle)
+                      style: Theme.of(context).textTheme.subtitle1)
                   ),
                 ),
                 Padding(
@@ -230,7 +234,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 10),
-                  child: FlatButton(
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -238,9 +242,11 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                       );                       
                     },
                     child: Text("Registrarse"),
-                    textTheme: Theme.of(context).buttonTheme.textTheme,
+                    style: ButtonStyle(
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),)
+                    ),
+                    //textTheme: Theme.of(context).buttonTheme.textTheme,
 
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                   ),
                 ),
               ],

@@ -22,7 +22,7 @@ class RootPage extends StatefulWidget{
 
 class _RootPageState extends State<RootPage>{
   AuthStatus authStatus = AuthStatus.NO_DETERMINADO;
-  FirebaseUser _user;
+  User _user;
 
   @override
   void initState(){

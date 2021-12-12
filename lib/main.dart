@@ -18,10 +18,11 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.black,
         backgroundColor: Colors.redAccent,
         textTheme: TextTheme(
-          title: TextStyle(
+          
+          headline1: TextStyle(
             color: Colors.white,
           ),
-          subtitle: TextStyle(
+          subtitle1: TextStyle(
             fontWeight: FontWeight.w400,
           )
         )
@@ -32,12 +33,11 @@ class MyApp extends StatelessWidget {
         brightness: Brightness.dark,
         primarySwatch: Colors.blue,
         primaryColor: Colors.white,
-        buttonColor: Colors.white,
         textTheme: TextTheme(
-          title: TextStyle(
+          headline1: TextStyle(
             color: Colors.black,
           ),
-          subtitle: TextStyle(
+          subtitle1: TextStyle(
             fontWeight: FontWeight.w400,
           )
         )
